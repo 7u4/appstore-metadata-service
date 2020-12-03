@@ -27,7 +27,6 @@ import com.lgi.appstore.metadata.api.error.MaintainerAlreadyExistsException;
 import com.lgi.appstore.metadata.api.error.MaintainerNotFoundException;
 import com.lgi.appstore.metadata.model.Maintainer;
 import com.lgi.appstore.metadata.model.MaintainerToUpdate;
-import com.lgi.appstore.metadata.util.JsonProcessorHelper;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
@@ -40,15 +39,13 @@ import org.springframework.stereotype.Service;
 @Service("MaintainersPersistentService")
 public class PersistentMaintainersService implements MaintainersService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(PersistentAppsService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(PersistentMaintainersService.class);
 
     private final DSLContext dslContext;
-    private final JsonProcessorHelper jsonProcessorHelper;
 
     @Autowired
-    public PersistentMaintainersService(DSLContext dslContext, JsonProcessorHelper jsonProcessorHelper) {
+    public PersistentMaintainersService(DSLContext dslContext) {
         this.dslContext = dslContext;
-        this.jsonProcessorHelper = jsonProcessorHelper;
     }
 
     @Override
