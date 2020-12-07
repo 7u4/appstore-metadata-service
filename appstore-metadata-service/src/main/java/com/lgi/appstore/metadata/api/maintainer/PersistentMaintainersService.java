@@ -19,8 +19,8 @@
 
 package com.lgi.appstore.metadata.api.maintainer;
 
+import static com.lgi.appstore.metadata.jooq.model.Tables.APPLICATION;
 import static com.lgi.appstore.metadata.jooq.model.Tables.MAINTAINER;
-import static com.lgi.appstore.metadata.jooq.model.tables.Application.APPLICATION;
 
 import com.lgi.appstore.metadata.api.error.ApplicationAlreadyExistsException;
 import com.lgi.appstore.metadata.api.error.MaintainerAlreadyExistsException;
@@ -135,7 +135,7 @@ public class PersistentMaintainersService implements MaintainersService {
             final int applicationCount = localDslContext.selectCount()
                     .from(APPLICATION)
                     .where(APPLICATION.MAINTAINER_ID.eq(maintainerId))
-                    .execute();
+                    .fetchOne(0, int.class);
 
             if (applicationCount > 0) {
                 throw new ApplicationAlreadyExistsException(String.format("Can't remove maintainer '%s' with application(s) ", maintainerCode));
