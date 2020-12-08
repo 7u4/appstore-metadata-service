@@ -21,12 +21,14 @@ package com.lgi.appstore.metadata.api.maintainer;
 
 import static com.lgi.appstore.metadata.jooq.model.Tables.APPLICATION;
 import static com.lgi.appstore.metadata.jooq.model.Tables.MAINTAINER;
+import static org.jooq.impl.DSL.count;
 
 import com.lgi.appstore.metadata.api.error.ApplicationAlreadyExistsException;
 import com.lgi.appstore.metadata.api.error.MaintainerAlreadyExistsException;
 import com.lgi.appstore.metadata.api.error.MaintainerNotFoundException;
 import com.lgi.appstore.metadata.model.Maintainer;
 import com.lgi.appstore.metadata.model.MaintainerToUpdate;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
@@ -125,24 +127,22 @@ public class PersistentMaintainersService implements MaintainersService {
         return dslContext.transactionResult(configuration -> {
             final DSLContext localDslContext = DSL.using(configuration);
 
-            final Integer maintainerId = localDslContext.select(MAINTAINER.ID)
+            final Pair<Integer, Integer> maintainerIdWithApplicationCount = localDslContext.select(MAINTAINER.ID, count(APPLICATION.ID))
                     .from(MAINTAINER)
+                    .leftJoin(APPLICATION)
+                    .on(APPLICATION.MAINTAINER_ID.eq(MAINTAINER.ID))
                     .where(MAINTAINER.CODE.eq(maintainerCode))
+                    .groupBy(MAINTAINER.ID)
                     .fetchOptional()
-                    .map(integerRecord -> integerRecord.get(MAINTAINER.ID))
+                    .map(record -> Pair.of(record.get(0, Integer.class), record.get(1, Integer.class)))
                     .orElseThrow(() -> new MaintainerNotFoundException(maintainerCode));
 
-            final int applicationCount = localDslContext.selectCount()
-                    .from(APPLICATION)
-                    .where(APPLICATION.MAINTAINER_ID.eq(maintainerId))
-                    .fetchOne(0, int.class);
-
-            if (applicationCount > 0) {
+            if (maintainerIdWithApplicationCount.getRight() != null && maintainerIdWithApplicationCount.getRight() > 0) {
                 throw new ApplicationAlreadyExistsException(String.format("Can't remove maintainer '%s' with application(s) ", maintainerCode));
             }
 
             final int affectedRows = localDslContext.deleteFrom(MAINTAINER)
-                    .where(MAINTAINER.ID.eq(maintainerId))
+                    .where(MAINTAINER.ID.eq(maintainerIdWithApplicationCount.getLeft()))
                     .execute();
 
             return affectedRows > 0;
