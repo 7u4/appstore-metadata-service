@@ -59,7 +59,7 @@ public class MaintainersController {
 
     @PostMapping(produces = {"application/json"})
     public ResponseEntity<Void> createMaintainer(@Valid @RequestBody Maintainer maintainer) {
-        LOG.info("POST /maintainers/{maintainerCode} called with the following parameter: maintainer = '{}'", maintainer);
+        LOG.info("POST /maintainers called with the following parameter: maintainer = '{}'", maintainer);
 
         maintainersService.createMaintainer(maintainer);
 

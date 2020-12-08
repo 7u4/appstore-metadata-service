@@ -38,7 +38,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 @Primary
-@Service("MaintainersPersistentService")
+@Service("PersistentMaintainersService")
 public class PersistentMaintainersService implements MaintainersService {
 
     private static final Logger LOG = LoggerFactory.getLogger(PersistentMaintainersService.class);
