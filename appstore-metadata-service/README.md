@@ -70,3 +70,38 @@ There is also possibility to push 'jar' files and 'docker images' to remote repo
 ```
 mvn deploy -DskipITs=true -Djib.to.tags=<yourCommitHash> -Dregistry.url=<yourImageRegistryUrl> -Dregistry.namespace=<yourImageRegistryNamespace> -Djar.repository.url=<yourJarRegistryUrl> -Djar.repository.name=<yourJarRegistryName> -Djar.repository.id=<yourJarRegistryId>
 ```
+
+Usage examples 
+---
+
+### Maintainers 
+
+#### Creating new maintainer:
+```
+curl -X POST "http://localhost:8080/maintainers" -H  "accept: application/json" -H  "x-maintainer-id: 1234abcd" -H  "Content-Type: application/json" -d "{\"code\":\"lgi\",\"name\":\"Liberty Global\",\"address\":\"Liberty Global B.V., Boeing Avenue 53, 1119 PE Schiphol Rijk, The Netherlands\",\"homepage\":\"https://www.libertyglobal.com\",\"email\":\"developer@libertyglobal.com\"}"
+```
+
+#### Retrieve created maintainer:  
+```
+curl -X GET "http://localhost:8080/maintainers/lgi" -H  "accept: application/json" -H  "x-maintainer-id: 1234abcd"
+```
+
+```json
+{
+  "code": "lgi",
+  "name": "Liberty Global",
+  "address": "Liberty Global B.V., Boeing Avenue 53, 1119 PE Schiphol Rijk, The Netherlands",
+  "homepage": "https://www.libertyglobal.com",
+  "email": "developer@libertyglobal.com"
+}
+```
+
+#### Update created maintainer:
+```
+curl -X PUT "http://localhost:8080/maintainers/lgi" -H  "accept: */*" -H  "x-maintainer-id: 1234abcd" -H  "Content-Type: application/json" -d "{\"name\":\"Liberty Global\",\"address\":\"Liberty Global B.V., Boeing Avenue 53, 1119 PE Schiphol Rijk, The Netherlands\",\"homepage\":\"https://www.libertyglobal.com\",\"email\":\"developer@libertyglobal.com\"}"
+```
+
+#### Delete a created maintainer:
+```
+curl -X DELETE "http://localhost:8080/maintainers/lgi" -H  "accept: application/json" -H  "x-maintainer-id: 1234abcd"
+```
