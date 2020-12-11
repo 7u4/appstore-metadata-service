@@ -38,7 +38,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-import static com.lgi.appstore.metadata.api.testing.framework.steps.MaintainerSteps.DEFAULT_DEV_CODE;
+import static com.lgi.appstore.metadata.api.testing.framework.steps.MaintainerViewSteps.DEFAULT_DEV_CODE;
 
 @Profile("local-test")
 @Lazy

@@ -2,8 +2,8 @@ package com.lgi.appstore.metadata.api.testing
 
 import com.lgi.appstore.metadata.api.testing.framework.ITCaseContext
 import com.lgi.appstore.metadata.api.testing.framework.TestSession
-import com.lgi.appstore.metadata.api.testing.framework.steps.MaintainerSteps
-import com.lgi.appstore.metadata.api.testing.framework.steps.StbSteps
+import com.lgi.appstore.metadata.api.testing.framework.steps.MaintainerViewSteps
+import com.lgi.appstore.metadata.api.testing.framework.steps.StbViewSteps
 import org.junit.jupiter.api.extension.ExtendWith
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -14,24 +14,30 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 import spock.lang.Shared
 import spock.lang.Specification
 
-@ActiveProfiles("integration-test")
+@ActiveProfiles(["tests", "integration-test"])
 @ExtendWith([SpringExtension.class])
 @SpringBootTest(classes = ITCaseContext.class)
 class AsmsIntegrationSpecBase extends Specification {
-    /** @noinspection WeakerAccess as this might be used in test scenarios   */
+    /** @noinspection WeakerAccess as this might be used in test scenarios    */
     @Shared
     protected Logger LOG = LoggerFactory.getLogger(AsmsIntegrationSpecBase.class)
 
     @Autowired
-    protected MaintainerSteps maintainerSteps
+    protected MaintainerViewSteps maintainerSteps
 
     @Autowired
-    protected StbSteps stbSteps
+    protected StbViewSteps stbSteps
 
     @Autowired
     protected TestSession testSession
 
-    void cleanup() {
+    def setup() {
+        LOG.info("-----------------------------------------------------------------------------------------------------")
+        LOG.info("Starting test: {}", specificationContext.currentIteration.name)
+        LOG.info("-----------------------------------------------------------------------------------------------------")
+    }
+
+    def cleanup() {
         maintainerSteps.deleteAllAppsThatWereAdded()
     }
 }

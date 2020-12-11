@@ -34,7 +34,7 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Component
-public class StbSteps {
+public class StbViewSteps {
 
     @Autowired
     private StbPerspectiveAsmsClient stbPerspectiveAsmsClient;

@@ -25,6 +25,7 @@ import com.lgi.appstore.metadata.api.testing.framework.model.response.Applicatio
 import com.lgi.appstore.metadata.model.Application
 import com.lgi.appstore.metadata.model.ApplicationForUpdate
 import com.lgi.appstore.metadata.model.Category
+import com.lgi.appstore.metadata.model.Maintainer
 import io.restassured.path.json.JsonPath
 import io.restassured.response.ExtractableResponse
 import io.restassured.response.Response
@@ -53,11 +54,11 @@ import static com.lgi.appstore.metadata.api.testing.framework.model.response.App
 import static com.lgi.appstore.metadata.api.testing.framework.model.response.ApplicationDetailsPath.extract
 import static com.lgi.appstore.metadata.api.testing.framework.model.response.ApplicationDetailsPath.field
 import static com.lgi.appstore.metadata.api.testing.framework.model.response.PathBase.anyOf
-import static com.lgi.appstore.metadata.api.testing.framework.steps.MaintainerSteps.DEFAULT_DEV_ADDRESS
-import static com.lgi.appstore.metadata.api.testing.framework.steps.MaintainerSteps.DEFAULT_DEV_CODE
-import static com.lgi.appstore.metadata.api.testing.framework.steps.MaintainerSteps.DEFAULT_DEV_EMAIL
-import static com.lgi.appstore.metadata.api.testing.framework.steps.MaintainerSteps.DEFAULT_DEV_HOMEPAGE
-import static com.lgi.appstore.metadata.api.testing.framework.steps.MaintainerSteps.DEFAULT_DEV_NAME
+import static com.lgi.appstore.metadata.api.testing.framework.steps.MaintainerViewSteps.DEFAULT_DEV_ADDRESS
+import static com.lgi.appstore.metadata.api.testing.framework.steps.MaintainerViewSteps.DEFAULT_DEV_CODE
+import static com.lgi.appstore.metadata.api.testing.framework.steps.MaintainerViewSteps.DEFAULT_DEV_EMAIL
+import static com.lgi.appstore.metadata.api.testing.framework.steps.MaintainerViewSteps.DEFAULT_DEV_HOMEPAGE
+import static com.lgi.appstore.metadata.api.testing.framework.steps.MaintainerViewSteps.DEFAULT_DEV_NAME
 import static com.lgi.appstore.metadata.api.testing.framework.utils.DataUtils.appKeyFor
 import static com.lgi.appstore.metadata.api.testing.framework.utils.DataUtils.assembleSearchCriteria
 import static com.lgi.appstore.metadata.api.testing.framework.utils.DataUtils.mapAppsToKeys
@@ -156,8 +157,9 @@ class MaintainerApiFTSpec extends AsmsFeatureSpecBase {
 
     def "developer cannot access other developer application (GET/PUT/DELETE)"() {
         given: "2 developers create 2 applications"
-        def dev2 = "lgi-wannabe"
-        dbSteps.createNewMaintainer(dev2)
+        def dev2Code = "lgi-wannabe"
+        def dev2Details = new Maintainer().code(dev2Code).name("Name_" + UUID.randomUUID()) // minimum data to create one
+        maintainerSteps.createNewMaintainer(dev2Details)
         dbSteps.listMaintainers()
 
         def app1Id = randId()
@@ -171,7 +173,7 @@ class MaintainerApiFTSpec extends AsmsFeatureSpecBase {
                 .withId(app2Id).withVersion("2.2.2").forCreate()
 
         maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, app1)
-        maintainerSteps.createNewApplication_expectSuccess(dev2, app2)
+        maintainerSteps.createNewApplication_expectSuccess(dev2Code, app2)
 
         when: "default developer asks for another developer's application details"
         ExtractableResponse<Response> response = maintainerSteps.getApplicationDetails(DEFAULT_DEV_CODE, appKeyFor(app2)).extract()
@@ -594,7 +596,8 @@ class MaintainerApiFTSpec extends AsmsFeatureSpecBase {
     @Unroll
     def "query for applications list for #queryDevCode returns apps in latest versions in amount corresponding to given limit=#limit offset=#offset"() {
         given: "2 developers create 3 application: first creates 2 incl. multi-versioned and second only 1"
-        dbSteps.createNewMaintainer(dev2)
+        def dev2Details = new Maintainer().code(dev2Code).name("Name_" + UUID.randomUUID()) // minimum data to create one
+        maintainerSteps.createNewMaintainer(dev2Details)
         dbSteps.listMaintainers()
 
         Application app1v1 = builder().fromDefaults()
@@ -609,7 +612,7 @@ class MaintainerApiFTSpec extends AsmsFeatureSpecBase {
         maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, app1v1)
         maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, app1v2)
         maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, app2v1)
-        maintainerSteps.createNewApplication_expectSuccess(dev2, app3v1)
+        maintainerSteps.createNewApplication_expectSuccess(dev2Code, app3v1)
 
         when: "default developer asks for list of his applications specifying limit=#limit and offset=#offset"
         Map<String, Object> queryParams = queryParams(
@@ -637,12 +640,12 @@ class MaintainerApiFTSpec extends AsmsFeatureSpecBase {
         }
 
         where:
-        dev2   | id1      | id2      | id3      | limit | offset | v1       | v2      | v3      | queryDevCode     || possibleIds | possibleV | count | total | returnedLimit
-        "lgi2" | randId() | randId() | randId() | 3     | 0      | "0.0.11" | "0.1.0" | "1.1.0" | DEFAULT_DEV_CODE || [id1, id2]  | [v1, v2]  | 2     | 2     | limit
-        "lgi2" | randId() | randId() | randId() | null  | 0      | "0.1.1"  | "0.0.1" | "1.0.1" | dev2             || [id3]       | [v3]      | 1     | 1     | DEFAULT_LIMIT
-        "lgi2" | randId() | randId() | randId() | 1     | 0      | "0.11.1" | "1.0.1" | "2.0.1" | DEFAULT_DEV_CODE || [id1, id2]  | [v1, v2]  | 1     | 2     | limit
-        "lgi2" | randId() | randId() | randId() | 1     | 1      | "0.1.1"  | "0.0.1" | "1.0.1" | DEFAULT_DEV_CODE || [id1, id2]  | [v1, v2]  | 1     | 2     | limit
-        "lgi2" | randId() | randId() | randId() | 1     | 2      | "0.1.1"  | "0.0.1" | "1.0.1" | DEFAULT_DEV_CODE || _           | _         | 0     | 2     | limit
+        dev2Code | id1      | id2      | id3      | limit | offset | v1       | v2      | v3      | queryDevCode     || possibleIds | possibleV | count | total | returnedLimit
+        "lgi2"   | randId() | randId() | randId() | 3     | 0      | "0.0.11" | "0.1.0" | "1.1.0" | DEFAULT_DEV_CODE || [id1, id2]  | [v1, v2]  | 2     | 2     | limit
+        "lgi2"   | randId() | randId() | randId() | null  | 0      | "0.1.1"  | "0.0.1" | "1.0.1" | dev2Code         || [id3]       | [v3]      | 1     | 1     | DEFAULT_LIMIT
+        "lgi2"   | randId() | randId() | randId() | 1     | 0      | "0.11.1" | "1.0.1" | "2.0.1" | DEFAULT_DEV_CODE || [id1, id2]  | [v1, v2]  | 1     | 2     | limit
+        "lgi2"   | randId() | randId() | randId() | 1     | 1      | "0.1.1"  | "0.0.1" | "1.0.1" | DEFAULT_DEV_CODE || [id1, id2]  | [v1, v2]  | 1     | 2     | limit
+        "lgi2"   | randId() | randId() | randId() | 1     | 2      | "0.1.1"  | "0.0.1" | "1.0.1" | DEFAULT_DEV_CODE || _           | _         | 0     | 2     | limit
     }
 
     @Unroll

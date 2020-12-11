@@ -79,7 +79,7 @@ public class DataUtils {
     }
 
     public static String randomAppName() {
-        return FAKER.random().nextBoolean() ? FAKER.app().name() : FAKER.app().name() + "-" + FAKER.app().name();
+        return FAKER.random().nextBoolean() ? FAKER.app().name() : String.format("%s-%s", FAKER.app().name(), FAKER.app().name());
     }
 
     public static String randomAppDescription() {
@@ -133,16 +133,36 @@ public class DataUtils {
     private static String randomReversedDomainName() {
         int domainFirstWordIdx = 1;
         int domainMaxWords = 2 + FAKER.random().nextInt(3); // min 2, max 5
-        return FAKER.internet().domainSuffix() + "." + IntStream.range(domainFirstWordIdx, domainMaxWords).boxed()
+        return String.format("%s.%s", FAKER.internet().domainSuffix(), IntStream.range(domainFirstWordIdx, domainMaxWords).boxed()
                 .map(i -> FAKER.internet().domainWord())
-                .collect(Collectors.joining("."));
+                .collect(Collectors.joining(".")));
     }
 
     public static String randomPlatformArch() {
-        return FAKER.hacker().adjective() + "_" + FAKER.hacker().abbreviation();
+        return String.format("%s_%s", FAKER.hacker().adjective(), FAKER.hacker().abbreviation());
     }
 
     public static String randomPlatformOs() {
-        return FAKER.hacker().adjective() + "_" + FAKER.hacker().noun();
+        return String.format("%s_%s", FAKER.hacker().adjective(), FAKER.hacker().noun());
+    }
+
+    public static String devEmail() {
+        return FAKER.internet().emailAddress();
+    }
+
+    public static String devCode() {
+        return FAKER.internet().uuid();
+    }
+
+    public static String devName() {
+        return String.format("%s %s", FAKER.address().firstName(), FAKER.address().lastName());
+    }
+
+    public static String devHomepage() {
+        return FAKER.internet().url();
+    }
+
+    public static String devAddress() {
+        return FAKER.address().fullAddress();
     }
 }

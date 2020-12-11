@@ -11,8 +11,22 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @ExtendWith([SpringExtension.class])
 @SpringBootTest(classes = ITCaseContext.class)
 class AsmsSanitySpecBase extends AsmsIntegrationSpecBase {
-    void setup() {
-        LOG.info("Starting sanity tests -> setup spec.")
-        testSession.setTestType(TestSession.TestType.INTEGRATION_SANITY)
+    def initialized = false
+
+    def initSpec() {
+        if (!initialized) {
+            LOG.info("Starting tests -> init spec.")
+            testSession.setTestType(TestSession.TestType.INTEGRATION_SANITY)
+            maintainerSteps.createDefaultMaintainer()
+            initialized = true
+        }
+    }
+
+    def setup() {
+        initSpec()
+    }
+
+    def cleanup() {
+        maintainerSteps.deleteAllDevsThatWereAdded()
     }
 }

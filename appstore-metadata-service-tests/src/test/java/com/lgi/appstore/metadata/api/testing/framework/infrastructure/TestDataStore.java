@@ -112,7 +112,6 @@ public class TestDataStore extends PostgreSQLContainer<TestDataStore> {
         poolConfig.setUsername(singleton.getUsername());
         poolConfig.setPassword(singleton.getPassword());
         poolConfig.setDriverClassName(singleton.getDriverClassName());
-        poolConfig.setIdleTimeout(5000);
         poolConfig.setMaximumPoolSize(40);
         HikariDataSource hikariDataSource = new HikariDataSource(poolConfig);
         LOG.info("Datasource for tests created.");

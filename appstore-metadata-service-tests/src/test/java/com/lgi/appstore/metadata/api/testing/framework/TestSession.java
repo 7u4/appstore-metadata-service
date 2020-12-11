@@ -27,6 +27,7 @@ public class TestSession {
 
     private TestType testType;
     private Set<AppToCleanup> appsToCleanUp = new HashSet<>();
+    private Set<String> devsToCleanUp = new HashSet<>();
 
     @Autowired
     private Environment environment;
@@ -35,15 +36,28 @@ public class TestSession {
         appsToCleanUp.add(new AppToCleanup(maintainerCode, appKey));
     }
 
-    public List<AppToCleanup> getAppsToCleanuUp() {
+    public void addDevsToCleanUp(String maintainerCode) {
+        devsToCleanUp.add(maintainerCode);
+    }
+
+    public List<AppToCleanup> getAppsToCleanUp() {
         return new ArrayList<>(appsToCleanUp);
+    }
+
+    public List<String> getDevsToCleanUp() {
+        return new ArrayList<>(devsToCleanUp);
     }
 
     public void clearAppsToCleanUp() {
         appsToCleanUp.clear();
     }
 
+    public void clearDevsToCleanUp() {
+        devsToCleanUp.clear();
+    }
+
     public void setTestType(TestType testType) {
+        LOG.info("Setting test type: {}", testType);
         this.testType = testType;
     }
 

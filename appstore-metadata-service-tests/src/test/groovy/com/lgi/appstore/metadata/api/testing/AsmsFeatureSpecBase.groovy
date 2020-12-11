@@ -22,8 +22,8 @@ package com.lgi.appstore.metadata.api.testing
 import com.lgi.appstore.metadata.api.testing.framework.TestSession
 import com.lgi.appstore.metadata.api.testing.framework.base.DataSourceInitializer
 import com.lgi.appstore.metadata.api.testing.framework.steps.DbSteps
-import com.lgi.appstore.metadata.api.testing.framework.steps.MaintainerSteps
-import com.lgi.appstore.metadata.api.testing.framework.steps.StbSteps
+import com.lgi.appstore.metadata.api.testing.framework.steps.MaintainerViewSteps
+import com.lgi.appstore.metadata.api.testing.framework.steps.StbViewSteps
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -33,7 +33,7 @@ import org.springframework.test.context.ContextConfiguration
 import spock.lang.Shared
 import spock.lang.Specification
 
-@ActiveProfiles("local-test")
+@ActiveProfiles(["tests", "local-test"])
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ContextConfiguration(initializers = [DataSourceInitializer.class])
 class AsmsFeatureSpecBase extends Specification {
@@ -45,21 +45,34 @@ class AsmsFeatureSpecBase extends Specification {
     protected DbSteps dbSteps
 
     @Autowired
-    protected MaintainerSteps maintainerSteps
+    protected MaintainerViewSteps maintainerSteps
 
     @Autowired
-    protected StbSteps stbSteps
+    protected StbViewSteps stbSteps
 
     @Autowired
     protected TestSession testSession
 
-    void setup() {
-        LOG.info("Starting tests -> setup.")
-        dbSteps.checkConfigurationForMaxConnections()
-        testSession.setTestType(TestSession.TestType.LOCAL)
+    static boolean initialized = false
+
+    def initLocalTestEnv() {
+        if (!initialized) {
+            LOG.info("Starting tests -> init local test env.")
+            dbSteps.checkConfigurationForMaxConnections()
+            maintainerSteps.createDefaultMaintainer()
+            initialized = true
+        }
     }
 
-    void cleanup() {
+    def setup() {
+        LOG.info("-----------------------------------------------------------------------------------------------------")
+        LOG.info("Starting test: {}", specificationContext.currentIteration.name)
+        LOG.info("-----------------------------------------------------------------------------------------------------")
+        testSession.setTestType(TestSession.TestType.LOCAL)
+        initLocalTestEnv()
+    }
+
+    def cleanup() {
         LOG.info("Finishing tests -> cleanup.")
         dbSteps.dbCleanup()
     }

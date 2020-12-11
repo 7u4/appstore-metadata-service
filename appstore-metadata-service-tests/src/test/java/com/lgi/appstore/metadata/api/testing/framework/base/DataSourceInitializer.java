@@ -50,7 +50,8 @@ public class DataSourceInitializer implements ApplicationContextInitializer<Conf
                 "spring.datasource.password=" + dbPassword,
                 "spring.datasource.driver-class-name" + dbTestContainer.getDriverClassName(),
                 "spring.datasource.hikari.maximum-pool-size=40",
-                "spring.datasource.hikari.minimum-idle=5"
+                "spring.datasource.hikari.minimum-idle=5",
+                "spring.groovy.template.check-template-location=false"
         ).applyTo(environment);
     }
 }

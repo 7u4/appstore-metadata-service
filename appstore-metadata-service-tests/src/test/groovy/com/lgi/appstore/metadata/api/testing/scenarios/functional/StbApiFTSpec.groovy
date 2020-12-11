@@ -23,6 +23,7 @@ import com.lgi.appstore.metadata.api.testing.AsmsFeatureSpecBase
 import com.lgi.appstore.metadata.api.testing.framework.model.response.ApplicationsPath
 import com.lgi.appstore.metadata.model.Application
 import com.lgi.appstore.metadata.model.Category
+import com.lgi.appstore.metadata.model.Maintainer
 import io.restassured.path.json.JsonPath
 import io.restassured.response.ExtractableResponse
 import io.restassured.response.Response
@@ -49,11 +50,11 @@ import static com.lgi.appstore.metadata.api.testing.framework.model.response.App
 import static com.lgi.appstore.metadata.api.testing.framework.model.response.ApplicationDetailsPath.extract
 import static com.lgi.appstore.metadata.api.testing.framework.model.response.ApplicationDetailsPath.field
 import static com.lgi.appstore.metadata.api.testing.framework.model.response.PathBase.anyOf
-import static com.lgi.appstore.metadata.api.testing.framework.steps.MaintainerSteps.DEFAULT_DEV_ADDRESS
-import static com.lgi.appstore.metadata.api.testing.framework.steps.MaintainerSteps.DEFAULT_DEV_CODE
-import static com.lgi.appstore.metadata.api.testing.framework.steps.MaintainerSteps.DEFAULT_DEV_EMAIL
-import static com.lgi.appstore.metadata.api.testing.framework.steps.MaintainerSteps.DEFAULT_DEV_HOMEPAGE
-import static com.lgi.appstore.metadata.api.testing.framework.steps.MaintainerSteps.DEFAULT_DEV_NAME
+import static com.lgi.appstore.metadata.api.testing.framework.steps.MaintainerViewSteps.DEFAULT_DEV_ADDRESS
+import static com.lgi.appstore.metadata.api.testing.framework.steps.MaintainerViewSteps.DEFAULT_DEV_CODE
+import static com.lgi.appstore.metadata.api.testing.framework.steps.MaintainerViewSteps.DEFAULT_DEV_EMAIL
+import static com.lgi.appstore.metadata.api.testing.framework.steps.MaintainerViewSteps.DEFAULT_DEV_HOMEPAGE
+import static com.lgi.appstore.metadata.api.testing.framework.steps.MaintainerViewSteps.DEFAULT_DEV_NAME
 import static com.lgi.appstore.metadata.api.testing.framework.utils.DataUtils.appKeyFor
 import static com.lgi.appstore.metadata.api.testing.framework.utils.DataUtils.getFieldValueFromApplication
 import static com.lgi.appstore.metadata.api.testing.framework.utils.DataUtils.mapAppsToKeys
@@ -70,8 +71,9 @@ class StbApiFTSpec extends AsmsFeatureSpecBase {
     @Unroll
     def "queries for applications list returns apps in latest versions in amount corresponding to given limit=#limit offset=#offset"() {
         given: "2 developers create 3 application: first creates 2 incl. multi-versioned and second only 1"
-        def dev2 = "lgi2"
-        dbSteps.createNewMaintainer(dev2)
+        def dev2Code = "lgi-wannabe"
+        def dev2Details = new Maintainer().code(dev2Code).name("Name_" + UUID.randomUUID()) // minimum data to create one
+        maintainerSteps.createNewMaintainer(dev2Details)
         dbSteps.listMaintainers()
 
         Application app1v1 = builder().fromDefaults().withId(id1).withVersion(v1).forCreate()
@@ -82,7 +84,7 @@ class StbApiFTSpec extends AsmsFeatureSpecBase {
         maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, app1v1)
         maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, app1v2)
         maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, app2v1)
-        maintainerSteps.createNewApplication_expectSuccess(dev2, app3v1)
+        maintainerSteps.createNewApplication_expectSuccess(dev2Code, app3v1)
 
         when: "stb asks for list of his applications specifying limit and offset"
         Map<String, Object> queryParams = queryParams(
@@ -123,12 +125,14 @@ class StbApiFTSpec extends AsmsFeatureSpecBase {
     @Unroll
     def "queries for applications list returns apps corresponding to given filter by #queryParam"() {
         given: "2 developers create 3 application: first creates 2 incl. multi-versioned and second only 1"
-        def dev2 = "lgi2"
-        def dev3 = "lgi3"
+        def dev2Code = "lgi2"
+        def dev3Code = "lgi3"
         def dev2Name = "lgi2 name"
         def dev3Name = "lgi3 name"
-        dbSteps.createNewMaintainer(dev2, dev2Name)
-        dbSteps.createNewMaintainer(dev3, dev3Name)
+        def dev2Details = new Maintainer().code(dev2Code).name(dev2Name)
+        def dev3Details = new Maintainer().code(dev3Code).name(dev3Name)
+        maintainerSteps.createNewMaintainer(dev2Details)
+        maintainerSteps.createNewMaintainer(dev3Details)
         dbSteps.listMaintainers()
 
         Application app1v1 = builder().fromDefaults().withId(id1).withVersion(v1)
@@ -162,11 +166,11 @@ class StbApiFTSpec extends AsmsFeatureSpecBase {
         def matchingApp = apps.get(sourceOfCriteria)
         def criteria = getFieldValueFromApplication(queryParam, matchingApp, maintainerMappings)
 
-        maintainerSteps.createNewApplication_expectSuccess(dev2, app1v1)
-        maintainerSteps.createNewApplication_expectSuccess(dev2, app1v2)
-        maintainerSteps.createNewApplication_expectSuccess(dev2, app2v1)
-        maintainerSteps.createNewApplication_expectSuccess(dev2, app2v2)
-        maintainerSteps.createNewApplication_expectSuccess(dev3, app3v1)
+        maintainerSteps.createNewApplication_expectSuccess(dev2Code, app1v1)
+        maintainerSteps.createNewApplication_expectSuccess(dev2Code, app1v2)
+        maintainerSteps.createNewApplication_expectSuccess(dev2Code, app2v1)
+        maintainerSteps.createNewApplication_expectSuccess(dev2Code, app2v2)
+        maintainerSteps.createNewApplication_expectSuccess(dev3Code, app3v1)
 
         when: "stb asks for list of his applications specifying limit and offset"
         Map<String, Object> queryParams = queryParams(mapping(queryParam, criteria))

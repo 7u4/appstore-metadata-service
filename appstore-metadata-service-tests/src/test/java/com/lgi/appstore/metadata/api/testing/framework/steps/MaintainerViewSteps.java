@@ -24,6 +24,8 @@ import com.lgi.appstore.metadata.api.testing.framework.infrastructure.service.Ma
 import com.lgi.appstore.metadata.api.testing.framework.utils.DataUtils;
 import com.lgi.appstore.metadata.model.Application;
 import com.lgi.appstore.metadata.model.ApplicationForUpdate;
+import com.lgi.appstore.metadata.model.Maintainer;
+import com.lgi.appstore.metadata.model.MaintainerForUpdate;
 import io.qameta.allure.Step;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.ExtractableResponse;
@@ -40,20 +42,48 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Component
-public class MaintainerSteps {
-    private static final Logger LOG = LoggerFactory.getLogger(MaintainerSteps.class);
+public class MaintainerViewSteps {
+    private static final Logger LOG = LoggerFactory.getLogger(MaintainerViewSteps.class);
 
     public static final String DEFAULT_DEV_CODE = "lgi";
-    public static final String DEFAULT_DEV_NAME = "Liberty Global Inc.";
-    public static final String DEFAULT_DEV_ADDRESS = "Amsterdam";
-    public static final String DEFAULT_DEV_HOMEPAGE = "http://www.lgi.com";
-    public static final String DEFAULT_DEV_EMAIL = "email@lgi.com";
+    public static final String DEFAULT_DEV_NAME = "Liberty Global";
+    public static final String DEFAULT_DEV_ADDRESS = "Liberty Global B.V., Boeing Avenue 53, 1119 PE Schiphol Rijk, The Netherlands";
+    public static final String DEFAULT_DEV_HOMEPAGE = "https://www.libertyglobal.com";
+    public static final String DEFAULT_DEV_EMAIL = "developer@libertyglobal.com";
 
     @Autowired
     private MaintainerPerspectiveAsmsClient maintainerPerspectiveAsmsClient;
 
     @Autowired
     private TestSession testSession;
+
+    @Step
+    public void createNewMaintainer_expectSuccess(Maintainer devDetails) {
+        ValidatableResponse response = createNewMaintainer(devDetails);
+        int statusCode = response.extract().statusCode();
+        assertThat(statusCode).describedAs("HTTP status for create maintainer request").isEqualTo(HttpStatus.SC_CREATED);
+    }
+
+    @Step
+    public ValidatableResponse createNewMaintainer(Maintainer maintainerDetails) {
+        testSession.addDevsToCleanUp(maintainerDetails.getCode());
+        return maintainerPerspectiveAsmsClient.postMaintainer(maintainerDetails);
+    }
+
+    @Step
+    public ValidatableResponse getMaintainerDetails(String maintainerCode) {
+        return maintainerPerspectiveAsmsClient.getMaintainer(maintainerCode);
+    }
+
+    @Step
+    public ValidatableResponse updateMaintainer(String maintainerCode, MaintainerForUpdate newMaintainer) {
+        return maintainerPerspectiveAsmsClient.putMaintainer(maintainerCode, newMaintainer);
+    }
+
+    @Step
+    public ValidatableResponse deleteMaintainer(String maintainerCode) {
+        return maintainerPerspectiveAsmsClient.deleteMaintainer(maintainerCode);
+    }
 
     @Step
     public void createNewApplication_expectSuccess(String maintainerCode, Application applicationDetails) {
@@ -99,7 +129,7 @@ public class MaintainerSteps {
 
     public void deleteAllAppsThatWereAdded() {
         LOG.info("Applications cleanup...");
-        testSession.getAppsToCleanuUp().forEach(
+        testSession.getAppsToCleanUp().forEach(
                 app -> {
                     try {
                         deleteApplication(app.getMaintainerCode(), app.getApplicationKey()).extract();
@@ -108,5 +138,29 @@ public class MaintainerSteps {
                     }
                 });
         testSession.clearAppsToCleanUp();
+    }
+
+    public void deleteAllDevsThatWereAdded() {
+        LOG.info("Maintainers cleanup...");
+        testSession.getDevsToCleanUp().forEach(
+                dev -> {
+                    try {
+                        deleteMaintainer(dev).extract();
+                    } catch (Exception e) {
+                        LOG.warn("Could not perform cleanup due to: " + e.getClass().getSimpleName() + "-" + e.getMessage());
+                    }
+                });
+        testSession.clearDevsToCleanUp();
+    }
+
+    public void createDefaultMaintainer() {
+        Maintainer defaultDev = new Maintainer()
+                .code(DEFAULT_DEV_CODE)
+                .name(DEFAULT_DEV_NAME)
+                .address(DEFAULT_DEV_ADDRESS)
+                .email(DEFAULT_DEV_EMAIL)
+                .homepage(DEFAULT_DEV_HOMEPAGE);
+
+        createNewMaintainer(defaultDev);
     }
 }

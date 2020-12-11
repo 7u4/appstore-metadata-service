@@ -11,8 +11,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @ExtendWith([SpringExtension.class])
 @SpringBootTest(classes = ITCaseContext.class)
 class AsmsSmokeSpecBase extends AsmsIntegrationSpecBase {
-    void setup() {
-        LOG.info("Starting smoke tests -> setup spec.")
+    def setup() {
+        LOG.info("Starting smoke tests -> setup.")
         testSession.setTestType(TestSession.TestType.INTEGRATION_SMOKE)
+
+        // NOTE: Smoke tests suite assumes that there is some predefined test data like a default maintainer, default test apps, etc.
     }
 }

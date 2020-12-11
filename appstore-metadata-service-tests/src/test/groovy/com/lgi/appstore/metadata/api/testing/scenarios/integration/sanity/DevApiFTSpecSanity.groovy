@@ -29,11 +29,11 @@ import io.restassured.response.Response
 
 import static com.lgi.appstore.metadata.api.testing.framework.model.request.ApplicationMetadataBuilder.builder
 import static com.lgi.appstore.metadata.api.testing.framework.model.response.ApplicationDetailsPath.field
-import static com.lgi.appstore.metadata.api.testing.framework.steps.MaintainerSteps.DEFAULT_DEV_ADDRESS
-import static com.lgi.appstore.metadata.api.testing.framework.steps.MaintainerSteps.DEFAULT_DEV_CODE
-import static com.lgi.appstore.metadata.api.testing.framework.steps.MaintainerSteps.DEFAULT_DEV_EMAIL
-import static com.lgi.appstore.metadata.api.testing.framework.steps.MaintainerSteps.DEFAULT_DEV_HOMEPAGE
-import static com.lgi.appstore.metadata.api.testing.framework.steps.MaintainerSteps.DEFAULT_DEV_NAME
+import static com.lgi.appstore.metadata.api.testing.framework.steps.MaintainerViewSteps.DEFAULT_DEV_ADDRESS
+import static com.lgi.appstore.metadata.api.testing.framework.steps.MaintainerViewSteps.DEFAULT_DEV_CODE
+import static com.lgi.appstore.metadata.api.testing.framework.steps.MaintainerViewSteps.DEFAULT_DEV_EMAIL
+import static com.lgi.appstore.metadata.api.testing.framework.steps.MaintainerViewSteps.DEFAULT_DEV_HOMEPAGE
+import static com.lgi.appstore.metadata.api.testing.framework.steps.MaintainerViewSteps.DEFAULT_DEV_NAME
 import static com.lgi.appstore.metadata.api.testing.framework.utils.DataUtils.pickRandomCategory
 import static com.lgi.appstore.metadata.api.testing.framework.utils.DataUtils.pickRandomCategoryExcluding
 import static com.lgi.appstore.metadata.api.testing.framework.utils.DataUtils.randId
