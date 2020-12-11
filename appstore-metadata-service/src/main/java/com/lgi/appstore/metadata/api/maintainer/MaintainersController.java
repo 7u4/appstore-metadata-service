@@ -20,7 +20,7 @@
 package com.lgi.appstore.metadata.api.maintainer;
 
 import com.lgi.appstore.metadata.model.Maintainer;
-import com.lgi.appstore.metadata.model.MaintainerToUpdate;
+import com.lgi.appstore.metadata.model.MaintainerForUpdate;
 import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,13 +68,13 @@ public class MaintainersController {
 
     @PutMapping(value = "/{maintainerCode}", produces = {"application/json"})
     public ResponseEntity<Void> updateMaintainer(@PathVariable("maintainerCode") String maintainerCode,
-            @Valid @RequestBody MaintainerToUpdate maintainerToUpdate) {
+            @Valid @RequestBody MaintainerForUpdate maintainerForUpdate) {
 
         LOG.info(
                 "PUT /maintainers/{maintainerCode} called with the following parameters: maintainerCode = '{}, maintainer = '{}'",
-                maintainerCode, maintainerToUpdate);
+                maintainerCode, maintainerForUpdate);
 
-        final boolean updated = maintainersService.updateMaintainer(maintainerCode, maintainerToUpdate);
+        final boolean updated = maintainersService.updateMaintainer(maintainerCode, maintainerForUpdate);
 
         return updated
                 ? ResponseEntity.noContent().build()

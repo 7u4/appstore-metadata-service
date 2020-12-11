@@ -27,7 +27,7 @@ import com.lgi.appstore.metadata.api.error.ApplicationAlreadyExistsException;
 import com.lgi.appstore.metadata.api.error.MaintainerAlreadyExistsException;
 import com.lgi.appstore.metadata.api.error.MaintainerNotFoundException;
 import com.lgi.appstore.metadata.model.Maintainer;
-import com.lgi.appstore.metadata.model.MaintainerToUpdate;
+import com.lgi.appstore.metadata.model.MaintainerForUpdate;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
@@ -99,7 +99,7 @@ public class PersistentMaintainersService implements MaintainersService {
     }
 
     @Override
-    public boolean updateMaintainer(final String maintainerCode, final MaintainerToUpdate maintainerToUpdate) {
+    public boolean updateMaintainer(final String maintainerCode, final MaintainerForUpdate maintainerForUpdate) {
         return dslContext.transactionResult(configuration -> {
             final DSLContext localDslContext = DSL.using(configuration);
 
@@ -111,10 +111,10 @@ public class PersistentMaintainersService implements MaintainersService {
                     .orElseThrow(() -> new MaintainerNotFoundException(maintainerCode));
 
             final int affectedRows = localDslContext.update(MAINTAINER)
-                    .set(MAINTAINER.ADDRESS, maintainerToUpdate.getAddress())
-                    .set(MAINTAINER.EMAIL, maintainerToUpdate.getEmail())
-                    .set(MAINTAINER.HOMEPAGE, maintainerToUpdate.getHomepage())
-                    .set(MAINTAINER.NAME, maintainerToUpdate.getName())
+                    .set(MAINTAINER.ADDRESS, maintainerForUpdate.getAddress())
+                    .set(MAINTAINER.EMAIL, maintainerForUpdate.getEmail())
+                    .set(MAINTAINER.HOMEPAGE, maintainerForUpdate.getHomepage())
+                    .set(MAINTAINER.NAME, maintainerForUpdate.getName())
                     .where(MAINTAINER.ID.eq(maintainerId))
                     .execute();
 

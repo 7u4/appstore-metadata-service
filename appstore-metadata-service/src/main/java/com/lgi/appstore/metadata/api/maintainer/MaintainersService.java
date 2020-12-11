@@ -20,7 +20,7 @@
 package com.lgi.appstore.metadata.api.maintainer;
 
 import com.lgi.appstore.metadata.model.Maintainer;
-import com.lgi.appstore.metadata.model.MaintainerToUpdate;
+import com.lgi.appstore.metadata.model.MaintainerForUpdate;
 
 public interface MaintainersService {
 
@@ -28,7 +28,7 @@ public interface MaintainersService {
 
     void createMaintainer(Maintainer maintainer);
 
-    boolean updateMaintainer(String maintainerCode, MaintainerToUpdate maintainerToUpdate);
+    boolean updateMaintainer(String maintainerCode, MaintainerForUpdate maintainerForUpdate);
 
     boolean deleteMaintainer(String maintainerCode);
 }
