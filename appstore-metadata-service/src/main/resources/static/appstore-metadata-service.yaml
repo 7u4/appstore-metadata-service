@@ -223,7 +223,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/MaintainerToUpdate'
+              $ref: '#/components/schemas/MaintainerForUpdate'
       responses:
         204:
           description: OK
@@ -868,7 +868,7 @@ components:
           type: string
           description: Maintainer's email address
           example: developer@libertyglobal.com
-    MaintainerToUpdate:
+    MaintainerForUpdate:
       type: object
       required:
         - name
